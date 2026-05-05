@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,8 +9,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <div class="game-container">
+    <div class="mobile-tabs desktop-hidden">
+        <button class="tab-btn active" id="tabPlay">JUGAR</button>
+        <button class="tab-btn" id="tabInfo">CÓMO JUGAR</button>
+    </div>
+
+    <div class="game-container" id="gameContainer">
         <!-- Panel Izquierdo: Info -->
         <div class="panel left-panel glass">
             <h1>TETRIS <br><span class="highlight">4-LINK</span></h1>
@@ -53,28 +60,51 @@
                 </ul>
                 <p><strong>Power-Ups (10%):</strong></p>
                 <ul>
-                    <li><span class="badge b">B</span> Bomba (3x3)</li>
-                    <li><span class="badge m">M</span> Martillo (Fila/Col)</li>
+                    <li><span class="badge b">B</span> Bomba (elimina 3x3)</li>
+                    <li><span class="badge m">M</span> Martillo (Elimina Fila/Col)</li>
                     <li><span class="badge a">A</span> Arcoíris (Comodín)</li>
                 </ul>
-                <p class="desktop-only"><strong>Controles PC:</strong><br>Flechas para mover/rotar<br>Espacio para soltar</p>
+                <p class="desktop-only"><strong>Controles PC:</strong><br>Flechas para mover/rotar<br>Espacio para
+                    soltar</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de Instrucciones Móvil -->
+    <div class="mobile-info-panel desktop-hidden hidden" id="mobileInfoPanel">
+        <div class="panel glass">
+            <h2>CÓMO JUGAR</h2>
+            <div class="instructions">
+                <p><strong>Mecánicas:</strong></p>
+                <ul>
+                    <li>Combina 4+ colores (horizontal, vertical, diagonal).</li>
+                    <li>Completa líneas enteras.</li>
+                    <li>¡Cuidado con la cascada!</li>
+                </ul>
+                <p><strong>Power-Ups (10%):</strong></p>
+                <ul>
+                    <li><span class="badge b">B</span> Bomba (elimina 3x3)</li>
+                    <li><span class="badge m">M</span> Martillo (Elimina Fila/Col)</li>
+                    <li><span class="badge a">A</span> Arcoíris (Comodín)</li>
+                </ul>
             </div>
         </div>
     </div>
 
     <!-- Controles Táctiles (Móvil/Tablet) -->
     <div class="touch-controls" id="touchControls">
-        <div class="d-pad">
-            <button class="t-btn up" id="btnUp">↻</button>
-            <button class="t-btn left" id="btnLeft">←</button>
-            <button class="t-btn right" id="btnRight">→</button>
-            <button class="t-btn down" id="btnDown">↓</button>
+        <div class="left-controls">
+            <button class="t-btn" id="btnUp">↻</button>
+            <button class="t-btn" id="btnDrop">⬇</button>
         </div>
-        <div class="action-pad">
-            <button class="t-btn drop" id="btnDrop">⬇</button>
+        <div class="right-controls">
+            <button class="t-btn" id="btnLeft">←</button>
+            <button class="t-btn" id="btnRight">→</button>
+            <button class="t-btn" id="btnMobilePause">⏸</button>
         </div>
     </div>
 
     <script src="script.js"></script>
 </body>
+
 </html>

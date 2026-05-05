@@ -15,8 +15,14 @@ const finalScoreEl = document.getElementById('finalScore');
 const btnUp = document.getElementById('btnUp');
 const btnLeft = document.getElementById('btnLeft');
 const btnRight = document.getElementById('btnRight');
-const btnDown = document.getElementById('btnDown');
 const btnDrop = document.getElementById('btnDrop');
+const btnMobilePause = document.getElementById('btnMobilePause');
+
+// Mobile Tabs
+const tabPlay = document.getElementById('tabPlay');
+const tabInfo = document.getElementById('tabInfo');
+const gameContainer = document.getElementById('gameContainer');
+const mobileInfoPanel = document.getElementById('mobileInfoPanel');
 
 // Constants
 const COLS = 10;
@@ -533,19 +539,44 @@ startBtn.addEventListener('click', () => {
     startBtn.blur();
 });
 
-pauseBtn.addEventListener('click', () => {
+pauseBtn.addEventListener('click', togglePause);
+
+function togglePause() {
     if (gameOver || !currentPiece) return;
     isPaused = !isPaused;
     if (isPaused) {
         pauseScreen.classList.remove('hidden');
         pauseBtn.innerText = "REANUDAR";
+        if (btnMobilePause) btnMobilePause.innerText = "▶";
     } else {
         pauseScreen.classList.add('hidden');
         pauseBtn.innerText = "PAUSAR";
+        if (btnMobilePause) btnMobilePause.innerText = "⏸";
         lastTime = performance.now(); // reset time to prevent instant drop
     }
     pauseBtn.blur();
-});
+}
+
+if (btnMobilePause) {
+    btnMobilePause.addEventListener('click', togglePause);
+}
+
+// Mobile Tabs Logic
+if (tabPlay && tabInfo) {
+    tabPlay.addEventListener('click', () => {
+        tabPlay.classList.add('active');
+        tabInfo.classList.remove('active');
+        gameContainer.classList.remove('desktop-hidden');
+        mobileInfoPanel.classList.add('hidden');
+    });
+
+    tabInfo.addEventListener('click', () => {
+        tabInfo.classList.add('active');
+        tabPlay.classList.remove('active');
+        gameContainer.classList.add('desktop-hidden');
+        mobileInfoPanel.classList.remove('hidden');
+    });
+}
 
 // Touch mapping (prevent default to stop zoom/scroll)
 const addTouch = (el, action) => {
@@ -559,7 +590,6 @@ const addTouch = (el, action) => {
 addTouch(btnLeft, moveLeft);
 addTouch(btnRight, moveRight);
 addTouch(btnUp, rotate);
-addTouch(btnDown, drop);
 addTouch(btnDrop, hardDrop);
 
 // Initial Draw (Empty State)

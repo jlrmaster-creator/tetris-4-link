@@ -229,22 +229,15 @@ h2 {
     padding: 10px 20px;
     justify-content: space-between;
     align-items: center;
-    max-width: 500px;
-    margin: 0 auto;
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    z-index: 100;
 }
 
-.d-pad {
-    display: grid;
-    grid-template-areas: 
-        ". up ."
-        "left . right"
-        ". down .";
-    gap: 10px;
-}
-
-.action-pad {
+.left-controls, .right-controls {
     display: flex;
-    align-items: flex-end;
+    gap: 15px;
 }
 
 .t-btn {
@@ -259,24 +252,51 @@ h2 {
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(4px);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
 }
 .t-btn:active {
     background: rgba(255,255,255,0.3);
 }
 
-.up { grid-area: up; }
-.left { grid-area: left; }
-.right { grid-area: right; }
-.down { grid-area: down; }
-.drop { 
-    width: 80px; 
-    height: 80px; 
-    background: rgba(56, 189, 248, 0.3);
-    border-color: rgba(56, 189, 248, 0.6);
-    font-size: 32px;
+/* Tabs for mobile */
+.mobile-tabs {
+    display: none;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.3);
+    overflow: hidden;
 }
-.drop:active {
-    background: rgba(56, 189, 248, 0.6);
+
+.tab-btn {
+    flex: 1;
+    background: transparent;
+    color: var(--text-muted);
+    border: none;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+    background: var(--accent);
+    color: white;
+}
+
+.mobile-info-panel {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.desktop-hidden {
+    display: none !important;
 }
 
 /* Responsiveness */
@@ -285,30 +305,35 @@ h2 {
         flex-direction: column;
         align-items: center;
         gap: 10px;
-        padding: 10px;
+        padding: 5px;
+        padding-bottom: 100px; /* Space for fixed controls */
     }
     
     .panel {
         width: 100%;
-        max-width: 320px;
+        max-width: 380px;
         flex-direction: row;
         flex-wrap: wrap;
         padding: 15px;
+        justify-content: center;
     }
 
     h1 { font-size: 1.5rem; width: 100%; text-align: center;}
-    .score-box { flex: 1; padding: 10px; }
-    .next-piece-box { flex: 1; padding: 10px; }
+    .score-box { flex: 1; padding: 10px; min-width: 100px; }
+    .next-piece-box { flex: 1; padding: 10px; min-width: 120px; }
     .btn { width: 100%; }
     
     .right-panel { display: none; } /* Ocultar instrucciones en movil para ahorrar espacio */
+    
+    .desktop-hidden { display: block !important; }
+    .mobile-tabs { display: flex !important; }
     
     .touch-controls { display: flex; }
     .desktop-only { display: none; }
     
     /* Escalar un poco el canvas en pantallas muy pequeñas */
     #gameCanvas {
-        height: 50vh;
+        height: 55vh;
         width: auto;
         aspect-ratio: 1 / 2;
     }
