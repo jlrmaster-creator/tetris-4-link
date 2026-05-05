@@ -426,7 +426,15 @@ async function executeLockSequence() {
     currentPiece = nextPiece;
     nextPiece = new Piece(Math.floor(COLS / 2) - 2, -2);
     
-    if (!board.isValidPos(currentPiece)) {
+    let hasReachedTop = false;
+    for (let x = 0; x < COLS; x++) {
+        if (board.grid[0][x]) {
+            hasReachedTop = true;
+            break;
+        }
+    }
+
+    if (hasReachedTop || !board.isValidPos(currentPiece)) {
         gameOver = true;
         gameOverScreen.classList.remove('hidden');
         finalScoreEl.innerText = score;
