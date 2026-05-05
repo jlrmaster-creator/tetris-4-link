@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tetris-4-Link</title>
+    <meta name="description" content="Un juego híbrido entre Tetris y Conecta 4.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Panel Izquierdo: Info -->
+        <div class="panel left-panel glass">
+            <h1>TETRIS <br><span class="highlight">4-LINK</span></h1>
+            <div class="score-box">
+                <h2>PUNTOS</h2>
+                <div id="score" class="value">0</div>
+            </div>
+            <div class="score-box">
+                <h2>NIVEL</h2>
+                <div id="level" class="value">1</div>
+            </div>
+            <div class="next-piece-box">
+                <h2>SIGUIENTE</h2>
+                <canvas id="nextPieceCanvas" width="120" height="120"></canvas>
+            </div>
+            <button id="startBtn" class="btn">INICIAR JUEGO</button>
+            <button id="pauseBtn" class="btn btn-secondary hidden">PAUSAR</button>
+        </div>
+
+        <!-- Centro: Tablero -->
+        <div class="board-wrapper glass">
+            <canvas id="gameCanvas" width="300" height="600"></canvas>
+            <div id="gameOverScreen" class="overlay hidden">
+                <h2>GAME OVER</h2>
+                <p>Puntuación Final: <span id="finalScore"></span></p>
+            </div>
+            <div id="pauseScreen" class="overlay hidden">
+                <h2>PAUSA</h2>
+            </div>
+        </div>
+
+        <!-- Panel Derecho: Instrucciones -->
+        <div class="panel right-panel glass">
+            <h2>CÓMO JUGAR</h2>
+            <div class="instructions">
+                <p><strong>Mecánicas:</strong></p>
+                <ul>
+                    <li>Combina 4+ colores (horizontal, vertical, diagonal).</li>
+                    <li>Completa líneas enteras.</li>
+                    <li>¡Cuidado con la cascada!</li>
+                </ul>
+                <p><strong>Power-Ups (10%):</strong></p>
+                <ul>
+                    <li><span class="badge b">B</span> Bomba (3x3)</li>
+                    <li><span class="badge m">M</span> Martillo (Fila/Col)</li>
+                    <li><span class="badge a">A</span> Arcoíris (Comodín)</li>
+                </ul>
+                <p class="desktop-only"><strong>Controles PC:</strong><br>Flechas para mover/rotar<br>Espacio para soltar</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controles Táctiles (Móvil/Tablet) -->
+    <div class="touch-controls" id="touchControls">
+        <div class="d-pad">
+            <button class="t-btn up" id="btnUp">↻</button>
+            <button class="t-btn left" id="btnLeft">←</button>
+            <button class="t-btn right" id="btnRight">→</button>
+            <button class="t-btn down" id="btnDown">↓</button>
+        </div>
+        <div class="action-pad">
+            <button class="t-btn drop" id="btnDrop">⬇</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
