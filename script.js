@@ -23,11 +23,21 @@ const tabPlay = document.getElementById('tabPlay');
 const tabInfo = document.getElementById('tabInfo');
 const gameContainer = document.getElementById('gameContainer');
 const mobileInfoPanel = document.getElementById('mobileInfoPanel');
+const touchControls = document.getElementById('touchControls');
 
 // --- Sound Engine ---
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let audioCtx;
+function initAudio() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+}
+
 function playArcadeSound(type) {
-    if (audioCtx.state === 'suspended') audioCtx.resume();
+    initAudio();
     
     const osc = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
@@ -618,6 +628,7 @@ document.addEventListener('keydown', event => {
 
 // Buttons
 startBtn.addEventListener('click', () => {
+    initAudio();
     startBtn.innerText = "REINICIAR";
     startGame();
     // Blur to avoid spacebar pressing it again
@@ -649,26 +660,38 @@ if (btnMobilePause) {
 // Mobile Tabs Logic
 if (tabPlay && tabInfo) {
     tabPlay.addEventListener('click', () => {
+        initAudio();
         tabPlay.classList.add('active');
         tabInfo.classList.remove('active');
         gameContainer.classList.remove('hidden');
         mobileInfoPanel.classList.add('hidden');
+        if (touchControls) touchControls.classList.remove('hidden');
     });
 
     tabInfo.addEventListener('click', () => {
+        initAudio();
         tabInfo.classList.add('active');
         tabPlay.classList.remove('active');
         gameContainer.classList.add('hidden');
         mobileInfoPanel.classList.remove('hidden');
+        if (touchControls) touchControls.classList.add('hidden');
     });
 }
 
 // Touch mapping (prevent default to stop zoom/scroll)
 const addTouch = (el, action) => {
     if(el) {
-        el.addEventListener('touchstart', (e) => { e.preventDefault(); action(); }, {passive: false});
+        el.addEventListener('touchstart', (e) => { 
+            initAudio();
+            e.preventDefault(); 
+            action(); 
+        }, {passive: false});
         // También click para testeos rápidos con mouse en móvil view
-        el.addEventListener('mousedown', (e) => { e.preventDefault(); action(); });
+        el.addEventListener('mousedown', (e) => { 
+            initAudio();
+            e.preventDefault(); 
+            action(); 
+        });
     }
 };
 
