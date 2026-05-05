@@ -24,6 +24,74 @@ const tabInfo = document.getElementById('tabInfo');
 const gameContainer = document.getElementById('gameContainer');
 const mobileInfoPanel = document.getElementById('mobileInfoPanel');
 
+// --- Sound Engine ---
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playArcadeSound(type) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    if (type === 'start') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.3);
+        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+    } else if (type === 'levelUp') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(400, audioCtx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(600, audioCtx.currentTime + 0.2);
+        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.6);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+    } else if (type === 'clear') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.2);
+        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+    } else if (type === 'bomb') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+    } else if (type === 'gameover') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(50, audioCtx.currentTime + 0.8);
+        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.8);
+    }
+}
+
+function speak(text) {
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.pitch = 1.5; // High pitch for funny voice
+        utterance.rate = 1.2;
+        utterance.lang = 'es-ES';
+        window.speechSynthesis.speak(utterance);
+    }
+}
+
+function playSoundEvent(type) {
+    playArcadeSound(type);
+    if (type === 'start') speak("¡A jugar!");
+    else if (type === 'levelUp') speak("¡Súper nivel!");
+    else if (type === 'clear') speak("¡Toma ya!");
+    else if (type === 'bomb') speak("¡Bum bomba!");
+    else if (type === 'gameover') speak("¡Oh no, perdiste!");
+}
+
 // Constants
 const COLS = 10;
 const ROWS = 20;
@@ -369,7 +437,11 @@ function draw() {
 
 function updateScore(points) {
     score += points;
-    level = Math.floor(score / 500) + 1;
+    let newLevel = Math.floor(score / 500) + 1;
+    if (newLevel > level) {
+        level = newLevel;
+        playSoundEvent('levelUp');
+    }
     dropInterval = Math.max(100, 1000 - ((level - 1) * 100));
     
     scoreEl.innerText = score;
@@ -387,6 +459,7 @@ async function executeLockSequence() {
     // 1. Landing Powerups (B, M)
     let res = board.checkPowerupsLanding(currentPiece);
     if (res.triggered) {
+        playSoundEvent('bomb');
         updateScore(res.points);
         draw();
         await sleep(300);
@@ -399,6 +472,7 @@ async function executeLockSequence() {
     while (true) {
         let lines = board.clearLines();
         if (lines > 0) {
+            playSoundEvent('clear');
             updateScore([0, 100, 300, 500, 800][lines]);
             draw();
             await sleep(200);
@@ -406,6 +480,7 @@ async function executeLockSequence() {
 
         let c4 = board.checkConnect4();
         if (c4.triggered) {
+            playSoundEvent('clear');
             updateScore(c4.points);
             draw();
             await sleep(200);
@@ -436,6 +511,7 @@ async function executeLockSequence() {
 
     if (hasReachedTop || !board.isValidPos(currentPiece)) {
         gameOver = true;
+        playSoundEvent('gameover');
         gameOverScreen.classList.remove('hidden');
         finalScoreEl.innerText = score;
     }
@@ -485,6 +561,7 @@ function startGame() {
     
     if (reqId) cancelAnimationFrame(reqId);
     lastTime = performance.now();
+    playSoundEvent('start');
     update(lastTime);
 }
 
@@ -574,14 +651,14 @@ if (tabPlay && tabInfo) {
     tabPlay.addEventListener('click', () => {
         tabPlay.classList.add('active');
         tabInfo.classList.remove('active');
-        gameContainer.classList.remove('desktop-hidden');
+        gameContainer.classList.remove('hidden');
         mobileInfoPanel.classList.add('hidden');
     });
 
     tabInfo.addEventListener('click', () => {
         tabInfo.classList.add('active');
         tabPlay.classList.remove('active');
-        gameContainer.classList.add('desktop-hidden');
+        gameContainer.classList.add('hidden');
         mobileInfoPanel.classList.remove('hidden');
     });
 }

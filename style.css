@@ -377,8 +377,8 @@ h2 {
     
     .right-panel { display: none; }
     
-    .desktop-hidden { display: flex !important; }
-    .mobile-info-panel.desktop-hidden { display: block !important; }
+    .desktop-hidden:not(.hidden) { display: flex !important; }
+    .mobile-info-panel.desktop-hidden:not(.hidden) { display: block !important; }
     
     .touch-controls { 
         display: flex; 
