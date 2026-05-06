@@ -377,6 +377,7 @@ let heldPiece = null;
 let canHold = true;
 let score = 0;
 let comboCount = 0;
+let pieceCount = 0;
 let level = 1;
 let dropCounter = 0;
 let dropInterval = 1000;
@@ -445,6 +446,25 @@ function draw() {
     ctx.fillStyle = '#0a0a0f';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     drawGrid(ctx, canvas.width, canvas.height);
+
+    // Draw Ghost Piece
+    if (currentPiece && !isAnimating) {
+        let ghostY = currentPiece.y;
+        while (board.isValidPos(currentPiece, 0, ghostY - currentPiece.y + 1)) {
+            ghostY++;
+        }
+        
+        ctx.save();
+        ctx.globalAlpha = 0.2;
+        for (let y = 0; y < currentPiece.blocks.length; y++) {
+            for (let x = 0; x < currentPiece.blocks[y].length; x++) {
+                if (currentPiece.blocks[y][x]) {
+                    drawBlock(ctx, currentPiece.x + x, ghostY + y, currentPiece.blocks[y][x]);
+                }
+            }
+        }
+        ctx.restore();
+    }
 
     // Draw Board
     for (let y = 0; y < ROWS; y++) {
@@ -525,6 +545,7 @@ function updateScore(points) {
 // Sequence logic separated from render loop for animation delays
 async function executeLockSequence() {
     isAnimating = true;
+    pieceCount++;
     board.lockPiece(currentPiece);
     draw();
 
@@ -594,6 +615,26 @@ async function executeLockSequence() {
                 }
             }
         }
+    }
+
+    // 4. Level 8+ Obstacles
+    if (level >= 8 && pieceCount % 10 === 0) {
+        board.grid.shift();
+        let newRow = Array(COLS).fill(null);
+        let holeCount = Math.floor(Math.random() * 3) + 1; // 1 to 3 holes
+        let holeIndices = new Set();
+        while (holeIndices.size < holeCount) holeIndices.add(Math.floor(Math.random() * COLS));
+        
+        for (let x = 0; x < COLS; x++) {
+            if (!holeIndices.has(x)) {
+                let obs = new Block('#555', null);
+                obs.isBlocked = true;
+                obs.blockedTurns = 999; // Permanent obstacle
+                newRow[x] = obs;
+            }
+        }
+        board.grid.push(newRow);
+        playSoundEvent('bomb');
     }
 
     // Next piece
