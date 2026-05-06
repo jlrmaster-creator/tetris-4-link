@@ -83,6 +83,15 @@ function playArcadeSound(type) {
         gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
         gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
         osc.start(); osc.stop(audioCtx.currentTime + 0.8);
+    } else if (type === 'connect4') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(554.37, audioCtx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.2);
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.3);
+        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.5);
     }
 }
 
@@ -100,7 +109,8 @@ function playSoundEvent(type) {
     playArcadeSound(type);
     if (type === 'start') speak("¡A jugar!");
     else if (type === 'levelUp') speak("¡Súper nivel!");
-    else if (type === 'clear') speak("¡Toma ya!");
+    else if (type === 'clear') speak("¡Línea!");
+    else if (type === 'connect4') speak("¡Toma ya, 4 en raya!");
     else if (type === 'bomb') speak("¡Bum bomba!");
     else if (type === 'gameover') speak("¡Oh no, perdiste!");
 }
@@ -180,6 +190,8 @@ class Piece {
 class Board {
     constructor() {
         this.grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+        this.highlightedRows = []; // For line clear effect
+        this.highlightedBlocks = []; // For Connect 4 effect
     }
 
     isValidPos(piece, offsetX = 0, offsetY = 0) {
@@ -252,7 +264,7 @@ class Board {
     }
 
     clearLines() {
-        let linesCleared = 0;
+        let linesToClear = [];
         for (let y = ROWS - 1; y >= 0; y--) {
             let isFull = true;
             for (let x = 0; x < COLS; x++) {
@@ -261,14 +273,16 @@ class Board {
                     break;
                 }
             }
-            if (isFull) {
-                this.grid.splice(y, 1);
-                this.grid.unshift(Array(COLS).fill(null));
-                linesCleared++;
-                y++; // Re-check the current row index since things shifted down
-            }
+            if (isFull) linesToClear.push(y);
         }
-        return linesCleared;
+        return linesToClear;
+    }
+
+    removeLines(lines) {
+        lines.sort((a,b) => a-b).forEach(y => {
+            this.grid.splice(y, 1);
+            this.grid.unshift(Array(COLS).fill(null));
+        });
     }
 
     checkConnect4() {
@@ -312,12 +326,14 @@ class Board {
         }
 
         let points = toRemove.size * 100;
-        toRemove.forEach(pos => {
-            let [px, py] = pos.split(',').map(Number);
+        let coords = Array.from(toRemove).map(pos => pos.split(',').map(Number));
+        return { points, triggered: toRemove.size > 0, coords };
+    }
+
+    removeBlocks(coords) {
+        coords.forEach(([px, py]) => {
             this.grid[py][px] = null;
         });
-
-        return { points, triggered: toRemove.size > 0 };
     }
 
     applyCascadeGravity() {
@@ -423,6 +439,21 @@ function draw() {
         }
     }
 
+    // Draw Highlights
+    ctx.save();
+    board.highlightedRows.forEach(y => {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.fillRect(0, y * BLOCK_SIZE, canvas.width, BLOCK_SIZE);
+    });
+    board.highlightedBlocks.forEach(([x, y]) => {
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+    });
+    ctx.restore();
+
     // Draw Current Piece
     if (currentPiece) {
         for (let y = 0; y < currentPiece.blocks.length; y++) {
@@ -499,24 +530,34 @@ async function executeLockSequence() {
 
     // 2. Loop: Cascade -> Tetris -> Connect4 -> Repeat
     while (true) {
-        let lines = board.clearLines();
-        if (lines > 0) {
+        let linesToClear = board.clearLines();
+        if (linesToClear.length > 0) {
+            board.highlightedRows = linesToClear;
             playSoundEvent('clear');
-            updateScore(lines * 100); // Base points
             draw();
-            await sleep(200);
+            await sleep(300);
+            board.highlightedRows = [];
+            board.removeLines(linesToClear);
+            updateScore(linesToClear.length * 100);
+            draw();
+            await sleep(100);
         }
 
         let c4 = board.checkConnect4();
         if (c4.triggered) {
+            board.highlightedBlocks = c4.coords;
             comboCount++;
-            playSoundEvent('clear');
-            updateScore(1000); // Major points
+            playSoundEvent('connect4');
             draw();
-            await sleep(200);
+            await sleep(400); // Highlight longer for Connect 4
+            board.highlightedBlocks = [];
+            board.removeBlocks(c4.coords);
+            updateScore(1000);
+            draw();
+            await sleep(100);
         }
 
-        if (lines > 0 || c4.triggered) {
+        if (linesToClear.length > 0 || c4.triggered) {
             let moved = board.applyCascadeGravity();
             if (moved) {
                 draw();
