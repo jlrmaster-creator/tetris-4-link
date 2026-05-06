@@ -502,7 +502,7 @@ async function executeLockSequence() {
         let lines = board.clearLines();
         if (lines > 0) {
             playSoundEvent('clear');
-            updateScore([0, 100, 300, 500, 800][lines]);
+            updateScore(lines * 100); // Base points
             draw();
             await sleep(200);
         }
@@ -511,7 +511,7 @@ async function executeLockSequence() {
         if (c4.triggered) {
             comboCount++;
             playSoundEvent('clear');
-            updateScore(c4.points);
+            updateScore(1000); // Major points
             draw();
             await sleep(200);
         }
