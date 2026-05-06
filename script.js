@@ -2,11 +2,14 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const nextCanvas = document.getElementById('nextPieceCanvas');
 const nextCtx = nextCanvas.getContext('2d');
+const holdCanvas = document.getElementById('holdPieceCanvas');
+const holdCtx = holdCanvas ? holdCanvas.getContext('2d') : null;
 
 const scoreEl = document.getElementById('score');
 const comboEl = document.getElementById('combo');
 const levelEl = document.getElementById('level');
 const startBtn = document.getElementById('startBtn');
+const holdBtn = document.getElementById('holdBtn');
 const pauseBtn = document.getElementById('pauseBtn');
 const gameOverScreen = document.getElementById('gameOverScreen');
 const pauseScreen = document.getElementById('pauseScreen');
@@ -17,6 +20,7 @@ const btnUp = document.getElementById('btnUp');
 const btnLeft = document.getElementById('btnLeft');
 const btnRight = document.getElementById('btnRight');
 const btnDrop = document.getElementById('btnDrop');
+const btnHold = document.getElementById('btnHold');
 const btnMobilePause = document.getElementById('btnMobilePause');
 
 // Mobile Tabs
@@ -341,6 +345,8 @@ class Board {
 let board = new Board();
 let currentPiece = null;
 let nextPiece = null;
+let heldPiece = null;
+let canHold = true;
 let score = 0;
 let comboCount = 0;
 let level = 1;
@@ -433,10 +439,8 @@ function draw() {
     // Draw Next Piece
     nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
     if (nextPiece) {
-        // Center it
         const offsetX = (nextCanvas.width / BLOCK_SIZE - nextPiece.blocks[0].length) / 2;
         const offsetY = (nextCanvas.height / BLOCK_SIZE - nextPiece.blocks.length) / 2;
-        
         for (let y = 0; y < nextPiece.blocks.length; y++) {
             for (let x = 0; x < nextPiece.blocks[y].length; x++) {
                 if (nextPiece.blocks[y][x]) {
@@ -444,6 +448,36 @@ function draw() {
                 }
             }
         }
+    }
+
+    // Draw Held Piece in Box
+    if (holdCtx) {
+        holdCtx.clearRect(0, 0, holdCanvas.width, holdCanvas.height);
+        if (heldPiece) {
+            const offsetX = (holdCanvas.width / BLOCK_SIZE - heldPiece.blocks[0].length) / 2;
+            const offsetY = (holdCanvas.height / BLOCK_SIZE - heldPiece.blocks.length) / 2;
+            for (let y = 0; y < heldPiece.blocks.length; y++) {
+                for (let x = 0; x < heldPiece.blocks[y].length; x++) {
+                    if (heldPiece.blocks[y][x]) {
+                        drawBlock(holdCtx, offsetX + x, offsetY + y, heldPiece.blocks[y][x]);
+                    }
+                }
+            }
+        }
+    }
+
+    // Draw Held Piece on Board (Frozen/Waiting)
+    if (heldPiece) {
+        ctx.save();
+        ctx.globalAlpha = 0.4;
+        for (let y = 0; y < heldPiece.blocks.length; y++) {
+            for (let x = 0; x < heldPiece.blocks[y].length; x++) {
+                if (heldPiece.blocks[y][x] && heldPiece.y + y >= 0) {
+                    drawBlock(ctx, heldPiece.x + x, heldPiece.y + y, { color: '#888' });
+                }
+            }
+        }
+        ctx.restore();
     }
 }
 
@@ -531,6 +565,7 @@ async function executeLockSequence() {
     }
 
     isAnimating = false;
+    canHold = true; // Allow hold again for the next piece
     dropCounter = 0;
 }
 
@@ -561,6 +596,8 @@ function startGame() {
     score = 0;
     comboCount = 0;
     level = 1;
+    heldPiece = null;
+    canHold = true;
     dropInterval = 1000;
     gameOver = false;
     isPaused = false;
@@ -620,6 +657,22 @@ function hardDrop() {
     executeLockSequence();
 }
 
+function toggleHold() {
+    if (isAnimating || gameOver || isPaused || !canHold) return;
+    
+    if (heldPiece === null) {
+        heldPiece = currentPiece;
+        currentPiece = nextPiece;
+        nextPiece = new Piece(Math.floor(COLS / 2) - 2, -2);
+    } else {
+        let temp = currentPiece;
+        currentPiece = heldPiece;
+        heldPiece = temp;
+    }
+    canHold = false;
+    draw();
+}
+
 // Keyboard
 document.addEventListener('keydown', event => {
     switch (event.code) {
@@ -628,6 +681,7 @@ document.addEventListener('keydown', event => {
         case 'ArrowUp': rotate(); break;
         case 'ArrowDown': drop(); break;
         case 'Space': hardDrop(); break;
+        case 'KeyH': toggleHold(); break;
     }
 });
 
@@ -660,6 +714,14 @@ function togglePause() {
 
 if (btnMobilePause) {
     btnMobilePause.addEventListener('click', togglePause);
+}
+
+if (holdBtn) {
+    holdBtn.addEventListener('click', () => {
+        initAudio();
+        toggleHold();
+        holdBtn.blur();
+    });
 }
 
 // Mobile Tabs Logic
@@ -704,6 +766,7 @@ addTouch(btnLeft, moveLeft);
 addTouch(btnRight, moveRight);
 addTouch(btnUp, rotate);
 addTouch(btnDrop, hardDrop);
+addTouch(btnHold, toggleHold);
 
 // Initial Draw (Empty State)
 draw();
