@@ -4,6 +4,7 @@ const nextCanvas = document.getElementById('nextPieceCanvas');
 const nextCtx = nextCanvas.getContext('2d');
 
 const scoreEl = document.getElementById('score');
+const comboEl = document.getElementById('combo');
 const levelEl = document.getElementById('level');
 const startBtn = document.getElementById('startBtn');
 const pauseBtn = document.getElementById('pauseBtn');
@@ -341,6 +342,7 @@ let board = new Board();
 let currentPiece = null;
 let nextPiece = null;
 let score = 0;
+let comboCount = 0;
 let level = 1;
 let dropCounter = 0;
 let dropInterval = 1000;
@@ -455,6 +457,7 @@ function updateScore(points) {
     dropInterval = Math.max(100, 1000 - ((level - 1) * 100));
     
     scoreEl.innerText = score;
+    comboEl.innerText = comboCount;
     levelEl.innerText = level;
 }
 
@@ -490,6 +493,7 @@ async function executeLockSequence() {
 
         let c4 = board.checkConnect4();
         if (c4.triggered) {
+            comboCount++;
             playSoundEvent('clear');
             updateScore(c4.points);
             draw();
@@ -555,6 +559,7 @@ function update(time = 0) {
 function startGame() {
     board = new Board();
     score = 0;
+    comboCount = 0;
     level = 1;
     dropInterval = 1000;
     gameOver = false;
