@@ -447,25 +447,6 @@ function draw() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     drawGrid(ctx, canvas.width, canvas.height);
 
-    // Draw Ghost Piece
-    if (currentPiece && !isAnimating) {
-        let ghostY = currentPiece.y;
-        while (board.isValidPos(currentPiece, 0, ghostY - currentPiece.y + 1)) {
-            ghostY++;
-        }
-        
-        ctx.save();
-        ctx.globalAlpha = 0.2;
-        for (let y = 0; y < currentPiece.blocks.length; y++) {
-            for (let x = 0; x < currentPiece.blocks[y].length; x++) {
-                if (currentPiece.blocks[y][x]) {
-                    drawBlock(ctx, currentPiece.x + x, ghostY + y, currentPiece.blocks[y][x]);
-                }
-            }
-        }
-        ctx.restore();
-    }
-
     // Draw Board
     for (let y = 0; y < ROWS; y++) {
         for (let x = 0; x < COLS; x++) {
@@ -773,7 +754,6 @@ document.addEventListener('keydown', event => {
 // Buttons
 startBtn.addEventListener('click', () => {
     initAudio();
-    startBtn.innerText = "REINICIAR";
     startGame();
     // Blur to avoid spacebar pressing it again
     startBtn.blur();
