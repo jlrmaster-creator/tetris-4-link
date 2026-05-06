@@ -397,6 +397,7 @@ let score = 0;
 let comboCount = 0;
 let pieceCount = 0;
 let level = 1;
+let reached1000 = false;
 let dropCounter = 0;
 let dropInterval = 1000;
 let lastTime = 0;
@@ -548,6 +549,11 @@ function updateScore(points) {
     }
     dropInterval = Math.max(100, 1000 - ((level - 1) * 100));
     
+    if (score >= 1000 && !reached1000) {
+        speak("¡¡¡¡¡ que viene tu madreeee !!!!");
+        reached1000 = true;
+    }
+
     scoreEl.innerText = score;
     comboEl.innerText = comboCount;
     levelEl.innerText = level;
@@ -701,6 +707,7 @@ function startGame() {
     level = 1;
     pieceCount = 0;
     comboCount = 0;
+    reached1000 = false;
     gameOver = false;
     isPaused = false;
     isAnimating = false;
