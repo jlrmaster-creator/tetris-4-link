@@ -313,25 +313,19 @@ h2 {
     
     .panel.left-panel {
         width: 100%;
-        max-width: 420px;
+        max-width: 100%;
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr 0.8fr;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
         grid-template-areas:
-            "title title start start"
-            "score combo level next";
-        gap: 4px;
-        padding: 2px 5px;
+            "score combo level next start";
+        gap: 2px;
+        padding: 2px;
+        margin: 0;
+        min-height: unset;
+        border-radius: 0;
     }
 
-    h1 { 
-        grid-area: title;
-        font-size: 0.9rem; 
-        text-align: left;
-        display: flex;
-        align-items: center;
-        white-space: nowrap;
-    }
-    h1 br { display: none; }
+    h1 { display: none !important; }
 
     .score-box, .next-piece-box { 
         padding: 2px; 
@@ -396,8 +390,8 @@ h2 {
     .desktop-only { display: none; }
     
     #gameCanvas {
-        height: calc(100vh - 130px);
-        max-height: 80vh;
+        height: calc(100vh - 100px);
+        max-height: 85vh;
         width: auto;
         aspect-ratio: 1 / 2;
     }
