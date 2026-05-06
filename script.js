@@ -658,16 +658,18 @@ function update(time = 0) {
 }
 
 function startGame() {
+    if (reqId) cancelAnimationFrame(reqId);
     board = new Board();
     score = 0;
-    comboCount = 0;
     level = 1;
-    heldPiece = null;
-    canHold = true;
-    dropInterval = 1000;
+    pieceCount = 0;
+    comboCount = 0;
     gameOver = false;
     isPaused = false;
     isAnimating = false;
+    canHold = true;
+    heldPiece = null;
+    dropInterval = 1000;
     gameOverScreen.classList.add('hidden');
     pauseScreen.classList.add('hidden');
     pauseBtn.classList.remove('hidden');
@@ -677,7 +679,6 @@ function startGame() {
     currentPiece = new Piece(Math.floor(COLS / 2) - 2, -2);
     nextPiece = new Piece(Math.floor(COLS / 2) - 2, -2);
     
-    if (reqId) cancelAnimationFrame(reqId);
     lastTime = performance.now();
     playSoundEvent('start');
     update(lastTime);
@@ -793,11 +794,16 @@ if (holdBtn) {
 if (tabPlay && tabInfo) {
     tabPlay.addEventListener('click', () => {
         initAudio();
-        tabPlay.classList.add('active');
-        tabInfo.classList.remove('active');
-        gameContainer.classList.remove('hidden');
-        mobileInfoPanel.classList.add('hidden');
-        if (touchControls) touchControls.classList.remove('hidden');
+        if (tabPlay.classList.contains('active')) {
+            startGame();
+            tabPlay.innerText = "REINICIAR";
+        } else {
+            tabPlay.classList.add('active');
+            tabInfo.classList.remove('active');
+            gameContainer.classList.remove('hidden');
+            mobileInfoPanel.classList.add('hidden');
+            if (touchControls) touchControls.classList.remove('hidden');
+        }
     });
 
     tabInfo.addEventListener('click', () => {
