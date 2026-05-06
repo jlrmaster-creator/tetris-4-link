@@ -107,7 +107,7 @@ function speak(text, pitch = 1.5, rate = 1.2) {
 
 function playSoundEvent(type) {
     playArcadeSound(type);
-    if (type === 'start') speak("¡A jugar!");
+    if (type === 'start') speak("¡¡¡ VAMOS ZUMAYO !!!", 0.9, 1.3);
     else if (type === 'levelUp') speak("¡Súper nivel!");
     else if (type === 'clear') speak("¡Línea!");
     else if (type === 'connect4') speak("¡Toma ya, 4 en raya!");
