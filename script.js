@@ -808,6 +808,7 @@ if (tabPlay && tabInfo) {
             tabInfo.classList.remove('active');
             gameContainer.classList.remove('hidden');
             mobileInfoPanel.classList.add('hidden');
+            mobileInfoPanel.classList.remove('active');
             if (touchControls) touchControls.classList.remove('hidden');
         }
     });
@@ -818,6 +819,7 @@ if (tabPlay && tabInfo) {
         tabPlay.classList.remove('active');
         gameContainer.classList.add('hidden');
         mobileInfoPanel.classList.remove('hidden');
+        mobileInfoPanel.classList.add('active');
         if (touchControls) touchControls.classList.add('hidden');
     });
 }

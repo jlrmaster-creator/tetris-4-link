@@ -303,13 +303,11 @@ h2 {
     .left-panel > .score-box { display: none !important; }
 
     .game-container {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
+        display: grid;
+        grid-template-columns: 55px 1fr;
+        grid-template-rows: 1fr;
         padding: 0;
-        height: calc(100vh - 100px);
-        width: 100vw;
+        height: calc(100vh - 110px);
         background: #000;
         gap: 0;
     }
@@ -324,8 +322,6 @@ h2 {
     }
 
     .left-panel {
-        width: 60px;
-        flex-shrink: 0;
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
@@ -342,11 +338,15 @@ h2 {
         padding-top: 20px !important;
     }
 
-    .score-box h2 { font-size: 0.5rem; color: #555; margin: 0; text-transform: uppercase; }
-    .score-box .value { font-size: 0.8rem; font-weight: bold; color: #fff; }
+    .score-box h2 { font-size: 0.4rem; color: #555; margin: 0; }
+    .score-box .value { font-size: 0.7rem; font-weight: bold; color: #fff; }
 
+    .next-piece-box {
+        display: block !important;
+        margin-bottom: 15px;
+    }
     .next-piece-box h2 { display: none; }
-    #nextPieceCanvas { width: 50px; height: 50px; }
+    #nextPieceCanvas { width: 45px; height: 45px; }
 
     #startBtn { display: none !important; }
 
@@ -357,7 +357,8 @@ h2 {
     .right-panel { display: none; }
     
     .desktop-hidden { display: flex !important; }
-    .mobile-info-panel.desktop-hidden { display: block !important; }
+    .mobile-info-panel.desktop-hidden { display: none !important; }
+    .mobile-info-panel.desktop-hidden.active { display: block !important; }
     
     .touch-controls { 
         display: flex; 
@@ -380,9 +381,10 @@ h2 {
     }
     
     #gameCanvas {
-        height: calc(100vh - 200px);
+        height: calc(100vh - 180px);
         width: auto;
         aspect-ratio: 1 / 2;
-        border: 1px solid #222;
+        border: 1px solid #1a1a1a;
+        margin: 0 auto;
     }
 }
