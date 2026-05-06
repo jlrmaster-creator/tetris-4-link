@@ -391,8 +391,8 @@ h2 {
     .desktop-only { display: none; }
     
     #gameCanvas {
-        height: calc(100vh - 150px);
-        max-height: 75vh;
+        height: calc(100vh - 200px);
+        max-height: 70vh;
         width: auto;
         aspect-ratio: 1 / 2;
     }
