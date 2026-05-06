@@ -302,11 +302,11 @@ h2 {
 @media (max-width: 900px) {
     .game-container {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         padding: 0;
         height: calc(100vh - 110px);
-        gap: 0;
-        background: transparent;
+        align-items: center;
+        background: #0a0a0f;
     }
 
     .panel {
@@ -319,45 +319,40 @@ h2 {
     }
 
     .left-panel {
-        width: 60px;
-        flex-shrink: 0;
+        width: 100%;
+        height: 60px;
         display: flex;
-        flex-direction: column;
-        padding: 5px 2px !important;
-        background: rgba(255,255,255,0.03) !important;
-        border-right: 1px solid rgba(255,255,255,0.05) !important;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+        padding: 5px 10px !important;
+        border-bottom: 1px solid rgba(255,255,255,0.05) !important;
     }
 
     .score-box {
-        padding: 1px;
-        margin-bottom: 2px;
-        background: transparent;
-        box-shadow: none;
-        border: none;
+        padding: 0;
+        margin: 0;
+        text-align: center;
     }
     .score-box h2 { 
         font-size: 0.5rem; 
         margin: 0; 
         color: #888;
-        letter-spacing: 0;
     }
     .score-box .value { 
-        font-size: 0.75rem; 
+        font-size: 0.9rem; 
         font-weight: 900;
+        margin-top: -2px;
     }
 
     .next-piece-box { 
-        order: -1;
-        width: 100%;
-        margin-bottom: 5px;
-        padding: 0;
-        background: transparent;
-        box-shadow: none;
-        border: none;
+        order: 0;
+        width: auto;
+        margin: 0;
     }
     #nextPieceCanvas {
-        width: 50px;
-        height: 50px;
+        width: 45px;
+        height: 45px;
     }
 
     #startBtn { display: none; }
@@ -386,20 +381,20 @@ h2 {
     .desktop-only { display: none; }
     
     .board-wrapper {
+        width: 100%;
         flex-grow: 1;
         display: flex;
         justify-content: center;
-        align-items: flex-start;
-        background: transparent !important;
-        padding: 0 !important;
+        align-items: center;
+        padding: 5px 0 !important;
     }
     
     #gameCanvas {
-        height: 100%;
-        max-height: calc(100vh - 120px);
-        width: auto;
+        width: 90vw;
+        height: auto;
         aspect-ratio: 1 / 2;
-        border: none;
-        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        max-height: calc(100vh - 210px);
+        border: 2px solid rgba(255,255,255,0.05);
+        border-radius: 4px;
     }
 }
