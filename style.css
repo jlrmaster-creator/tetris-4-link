@@ -303,20 +303,29 @@ h2 {
     .game-container {
         display: flex;
         flex-direction: row;
-        padding: 5px;
-        height: calc(100vh - 120px);
-        overflow: hidden;
+        padding: 0;
+        height: calc(100vh - 110px);
+        gap: 0;
+        background: transparent;
+    }
+
+    .panel {
+        min-width: unset !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        padding: 0 !important;
     }
 
     .left-panel {
-        width: 65px;
+        width: 60px;
         flex-shrink: 0;
         display: flex;
         flex-direction: column;
-        gap: 2px;
-        padding: 2px;
-        justify-content: flex-start;
-        background: rgba(0,0,0,0.2);
+        padding: 5px 2px !important;
+        background: rgba(255,255,255,0.03) !important;
+        border-right: 1px solid rgba(255,255,255,0.05) !important;
     }
 
     .score-box {
@@ -380,14 +389,17 @@ h2 {
         flex-grow: 1;
         display: flex;
         justify-content: center;
-        align-items: center;
-        margin-left: 5px;
+        align-items: flex-start;
+        background: transparent !important;
+        padding: 0 !important;
     }
     
     #gameCanvas {
         height: 100%;
+        max-height: calc(100vh - 120px);
         width: auto;
         aspect-ratio: 1 / 2;
-        max-height: calc(100vh - 150px);
+        border: none;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
     }
 }
