@@ -12,9 +12,6 @@ const pauseBtn = document.getElementById('pauseBtn');
 const gameOverScreen = document.getElementById('gameOverScreen');
 const pauseScreen = document.getElementById('pauseScreen');
 const finalScoreEl = document.getElementById('finalScore');
-const scoreMobile = document.getElementById('scoreMobile');
-const comboMobile = document.getElementById('comboMobile');
-const levelMobile = document.getElementById('levelMobile');
 
 // Touch Controls
 const btnUp = document.getElementById('btnUp');
@@ -524,9 +521,6 @@ function updateScore(points) {
     scoreEl.innerText = score;
     comboEl.innerText = comboCount;
     levelEl.innerText = level;
-    if (scoreMobile) scoreMobile.innerText = score;
-    if (comboMobile) comboMobile.innerText = comboCount;
-    if (levelMobile) levelMobile.innerText = level;
 }
 
 // Sequence logic separated from render loop for animation delays
