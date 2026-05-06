@@ -144,7 +144,10 @@ const POWERUPS = ['B', 'A', 'M']; // Bomb, Rainbow, Hammer
 class Block {
     constructor(color, powerup = null) {
         this.color = color;
+        this.originalColor = color;
         this.powerup = powerup;
+        this.isBlocked = false;
+        this.blockedTurns = 0;
     }
 }
 
@@ -155,16 +158,24 @@ class Piece {
         const shapeType = SHAPES[Math.floor(Math.random() * SHAPES.length)];
         
         this.blocks = [];
+        const isPieceBlocked = Math.random() < 0.1; // 10% chance
+        
         for (let r = 0; r < shapeType.length; r++) {
             let row = [];
             for (let c = 0; c < shapeType[r].length; c++) {
                 if (shapeType[r][c]) {
                     const color = COLORS[Math.floor(Math.random() * COLORS.length)];
                     let powerup = null;
-                    if (Math.random() < 0.03) { // Reduced to 3% to avoid random disappearances early on
+                    if (Math.random() < 0.03) {
                         powerup = POWERUPS[Math.floor(Math.random() * POWERUPS.length)];
                     }
-                    row.push(new Block(color, powerup));
+                    let block = new Block(color, powerup);
+                    if (isPieceBlocked) {
+                        block.isBlocked = true;
+                        block.blockedTurns = 4; // Stays blocked for 4 locks
+                        block.color = '#777';
+                    }
+                    row.push(block);
                 } else {
                     row.push(null);
                 }
@@ -267,13 +278,15 @@ class Board {
         let linesToClear = [];
         for (let y = ROWS - 1; y >= 0; y--) {
             let isFull = true;
+            let hasBlocked = false;
             for (let x = 0; x < COLS; x++) {
                 if (!this.grid[y][x]) {
                     isFull = false;
                     break;
                 }
+                if (this.grid[y][x].isBlocked) hasBlocked = true;
             }
-            if (isFull) linesToClear.push(y);
+            if (isFull && !hasBlocked) linesToClear.push(y);
         }
         return linesToClear;
     }
@@ -298,7 +311,8 @@ class Board {
         
         for (let y = 0; y < ROWS; y++) {
             for (let x = 0; x < COLS; x++) {
-                if (this.grid[y][x]) {
+                if (this.grid[y][x] && !this.grid[y][x].isBlocked) {
+                    const color = this.grid[y][x].color;
                     for (let [dx, dy] of directions) {
                         let matchCoords = [[x, y]];
                         let currX = x + dx;
@@ -308,7 +322,7 @@ class Board {
                             let prevCell = this.grid[matchCoords[matchCoords.length-1][1]][matchCoords[matchCoords.length-1][0]];
                             let currCell = this.grid[currY][currX];
                             
-                            if (isMatch(prevCell, currCell)) {
+                            if (isMatch(prevCell, currCell) && !currCell.isBlocked) {
                                 matchCoords.push([currX, currY]);
                                 currX += dx;
                                 currY += dy;
@@ -568,19 +582,26 @@ async function executeLockSequence() {
         }
     }
 
+    // 3. Update blocked blocks turns
+    for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS; x++) {
+            let block = board.grid[y][x];
+            if (block && block.isBlocked) {
+                block.blockedTurns--;
+                if (block.blockedTurns <= 0) {
+                    block.isBlocked = false;
+                    block.color = block.originalColor;
+                }
+            }
+        }
+    }
+
     // Next piece
     currentPiece = nextPiece;
     nextPiece = new Piece(Math.floor(COLS / 2) - 2, -2);
     
-    let hasReachedTop = false;
-    for (let x = 0; x < COLS; x++) {
-        if (board.grid[0][x]) {
-            hasReachedTop = true;
-            break;
-        }
-    }
-
-    if (hasReachedTop || !board.isValidPos(currentPiece)) {
+    // 4. Check if Game Over after all clears
+    if (!board.isValidPos(currentPiece)) {
         gameOver = true;
         playSoundEvent('gameover');
         gameOverScreen.classList.remove('hidden');
