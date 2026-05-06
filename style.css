@@ -317,12 +317,19 @@ h2 {
         align-items: center;
         padding-top: 10px !important;
     }
+    
+    .left-panel h1, 
+    .left-panel .score-box { 
+        display: none !important; 
+    }
 
     .mobile-stats-right {
-        margin-top: 20px;
+        width: 55px;
+        flex-shrink: 0;
+        margin-top: 10px;
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 8px;
         align-items: center;
     }
 
