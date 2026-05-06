@@ -95,11 +95,11 @@ function playArcadeSound(type) {
     }
 }
 
-function speak(text) {
+function speak(text, pitch = 1.5, rate = 1.2) {
     if ('speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.pitch = 1.5; // High pitch for funny voice
-        utterance.rate = 1.2;
+        utterance.pitch = pitch; 
+        utterance.rate = rate;
         utterance.lang = 'es-ES';
         window.speechSynthesis.speak(utterance);
     }
@@ -221,6 +221,7 @@ class Board {
     }
 
     lockPiece(piece) {
+        let overflow = false;
         for (let y = 0; y < piece.blocks.length; y++) {
             for (let x = 0; x < piece.blocks[y].length; x++) {
                 if (piece.blocks[y][x]) {
@@ -228,10 +229,13 @@ class Board {
                     let newX = piece.x + x;
                     if (newY >= 0) {
                         this.grid[newY][newX] = piece.blocks[y][x];
+                    } else {
+                        overflow = true;
                     }
                 }
             }
         }
+        return overflow;
     }
 
     checkPowerupsLanding(piece) {
@@ -563,8 +567,13 @@ function updateScore(points) {
 async function executeLockSequence() {
     isAnimating = true;
     pieceCount++;
-    board.lockPiece(currentPiece);
+    let overflow = board.lockPiece(currentPiece);
     draw();
+
+    if (overflow) {
+        triggerGameOver();
+        return;
+    }
 
     const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -667,15 +676,20 @@ async function executeLockSequence() {
     
     // 4. Check if Game Over after all clears
     if (!board.isValidPos(currentPiece)) {
-        gameOver = true;
-        playSoundEvent('gameover');
-        gameOverScreen.classList.remove('hidden');
-        finalScoreEl.innerText = score;
+        triggerGameOver();
     }
 
     isAnimating = false;
     canHold = true; // Allow hold again for the next piece
     dropCounter = 0;
+}
+
+function triggerGameOver() {
+    gameOver = true;
+    playSoundEvent('gameover');
+    gameOverScreen.classList.remove('hidden');
+    finalScoreEl.innerText = score;
+    speak(`¡muy bien machote, has conseguido ${score} puntos!`, 0.8, 1.1); // Mocking deep voice
 }
 
 function update(time = 0) {
