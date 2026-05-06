@@ -2,8 +2,6 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const nextCanvas = document.getElementById('nextPieceCanvas');
 const nextCtx = nextCanvas.getContext('2d');
-const holdCanvas = document.getElementById('holdPieceCanvas');
-const holdCtx = holdCanvas ? holdCanvas.getContext('2d') : null;
 
 const scoreEl = document.getElementById('score');
 const comboEl = document.getElementById('combo');
@@ -445,22 +443,6 @@ function draw() {
             for (let x = 0; x < nextPiece.blocks[y].length; x++) {
                 if (nextPiece.blocks[y][x]) {
                     drawBlock(nextCtx, offsetX + x, offsetY + y, nextPiece.blocks[y][x]);
-                }
-            }
-        }
-    }
-
-    // Draw Held Piece in Box
-    if (holdCtx) {
-        holdCtx.clearRect(0, 0, holdCanvas.width, holdCanvas.height);
-        if (heldPiece) {
-            const offsetX = (holdCanvas.width / BLOCK_SIZE - heldPiece.blocks[0].length) / 2;
-            const offsetY = (holdCanvas.height / BLOCK_SIZE - heldPiece.blocks.length) / 2;
-            for (let y = 0; y < heldPiece.blocks.length; y++) {
-                for (let x = 0; x < heldPiece.blocks[y].length; x++) {
-                    if (heldPiece.blocks[y][x]) {
-                        drawBlock(holdCtx, offsetX + x, offsetY + y, heldPiece.blocks[y][x]);
-                    }
                 }
             }
         }
