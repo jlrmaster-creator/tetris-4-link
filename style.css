@@ -299,47 +299,56 @@ h2 {
 
 /* Responsiveness */
 @media (max-width: 900px) {
+    h1, .left-panel h1 { display: none !important; }
+    .left-panel > .score-box { display: none !important; }
+
     .game-container {
         display: flex;
         flex-direction: row;
         justify-content: center;
-        align-items: flex-start;
-        padding: 5px 0;
-        height: calc(100vh - 120px);
+        align-items: center;
+        padding: 0;
+        height: calc(100vh - 100px);
+        width: 100vw;
         background: #000;
+        gap: 0;
+    }
+
+    .panel {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        padding: 0 !important;
+        min-width: unset !important;
     }
 
     .left-panel {
-        width: 55px;
+        width: 60px;
         flex-shrink: 0;
         display: flex;
         flex-direction: column;
-        align-items: center;
-        padding-top: 10px !important;
-    }
-    
-    .left-panel h1, 
-    .left-panel .score-box { 
-        display: none !important; 
+        justify-content: flex-start;
+        padding-top: 20px !important;
     }
 
     .mobile-stats-right {
-        width: 55px;
+        width: 60px;
         flex-shrink: 0;
-        margin-top: 10px;
         display: flex;
         flex-direction: column;
-        gap: 8px;
-        align-items: center;
+        gap: 15px;
+        justify-content: flex-start;
+        padding-top: 20px !important;
     }
 
-    .score-box h2 { font-size: 0.45rem; color: #666; margin: 0; }
-    .score-box .value { font-size: 0.7rem; font-weight: bold; color: #fff; }
+    .score-box h2 { font-size: 0.5rem; color: #555; margin: 0; text-transform: uppercase; }
+    .score-box .value { font-size: 0.8rem; font-weight: bold; color: #fff; }
 
     .next-piece-box h2 { display: none; }
-    #nextPieceCanvas { width: 45px; height: 45px; }
+    #nextPieceCanvas { width: 50px; height: 50px; }
 
-    #startBtn { display: none; }
+    #startBtn { display: none !important; }
 
     #holdBtn { display: none; }
     
