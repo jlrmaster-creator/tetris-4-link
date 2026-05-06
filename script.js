@@ -313,6 +313,8 @@ class Board {
             for (let x = 0; x < COLS; x++) {
                 if (this.grid[y][x] && !this.grid[y][x].isBlocked) {
                     const color = this.grid[y][x].color;
+                    
+                    // 1. Line Detection (H, V, D1, D2)
                     for (let [dx, dy] of directions) {
                         let matchCoords = [[x, y]];
                         let currX = x + dx;
@@ -333,6 +335,22 @@ class Board {
                         
                         if (matchCoords.length >= 4) {
                             matchCoords.forEach(coord => toRemove.add(`${coord[0]},${coord[1]}`));
+                        }
+                    }
+
+                    // 2. Square Detection (2x2)
+                    if (x < COLS - 1 && y < ROWS - 1) {
+                        let p1 = this.grid[y][x];
+                        let p2 = this.grid[y][x+1];
+                        let p3 = this.grid[y+1][x];
+                        let p4 = this.grid[y+1][x+1];
+                        if (p1 && p2 && p3 && p4 && !p2.isBlocked && !p3.isBlocked && !p4.isBlocked) {
+                            if (isMatch(p1, p2) && isMatch(p1, p3) && isMatch(p1, p4)) {
+                                toRemove.add(`${x},${y}`);
+                                toRemove.add(`${x+1},${y}`);
+                                toRemove.add(`${x},${y+1}`);
+                                toRemove.add(`${x+1},${y+1}`);
+                            }
                         }
                     }
                 }
@@ -393,16 +411,28 @@ function drawBlock(ctx, x, y, block) {
     
     // Base Color
     ctx.fillStyle = block.color;
+    
+    // Highlight effect if in highlightedBlocks
+    const isHighlighted = board.highlightedBlocks.some(c => c[0] === x && c[1] === y);
+    if (isHighlighted) {
+        ctx.fillStyle = '#fff';
+        ctx.shadowColor = '#fff';
+        ctx.shadowBlur = 15;
+    }
+
     ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+    ctx.shadowBlur = 0; // reset
     
     // Inner Shadow/Highlight for 3D effect
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-    ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE / 4); // top light
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-    ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE + (BLOCK_SIZE * 0.75), BLOCK_SIZE, BLOCK_SIZE / 4); // bottom shadow
+    if (!isHighlighted) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE / 4); // top light
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE + (BLOCK_SIZE * 0.75), BLOCK_SIZE, BLOCK_SIZE / 4); // bottom shadow
+    }
     
     // Border
-    ctx.strokeStyle = '#000';
+    ctx.strokeStyle = isHighlighted ? '#fff' : '#000';
     ctx.lineWidth = 1;
     ctx.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
     
@@ -561,12 +591,19 @@ async function executeLockSequence() {
 
         let c4 = board.checkConnect4();
         if (c4.triggered) {
-            board.highlightedBlocks = c4.coords;
             comboCount++;
             playSoundEvent('connect4');
-            draw();
-            await sleep(400); // Highlight longer for Connect 4
-            board.highlightedBlocks = [];
+            
+            // Funny Blink Animation
+            for (let i = 0; i < 4; i++) {
+                board.highlightedBlocks = c4.coords;
+                draw();
+                await sleep(80);
+                board.highlightedBlocks = [];
+                draw();
+                await sleep(80);
+            }
+
             board.removeBlocks(c4.coords);
             updateScore(1000);
             draw();
